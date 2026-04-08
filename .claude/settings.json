@@ -1,0 +1,24 @@
+{
+  "permissions": {
+    "allow": [
+      "*",
+      "Bash",
+      "Edit"
+    ]
+  },
+  "hooks": {
+    "UserPromptSubmit": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": ".claude/hooks/project-health-check.sh"
+          }
+        ]
+      }
+    ],
+    "PreToolUse": [],
+    "PostToolUse": [],
+    "Stop": []
+  }
+}
