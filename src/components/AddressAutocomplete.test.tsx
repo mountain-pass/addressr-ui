@@ -34,8 +34,6 @@ const searchResponse = () =>
     'https://addressr.p.rapidapi.com/addresses?q=1+george',
   );
 
-const emptySearchResponse = () =>
-  mockResponse([], {}, 'https://addressr.p.rapidapi.com/addresses?q=nothing');
 
 const detailResponse = () =>
   mockResponse(
