@@ -9,7 +9,7 @@ export interface AddressrClientOptions {
   apiKey?: string;
   apiUrl?: string;
   apiHost?: string;
-  /** @internal — for testing only */
+  /** Custom fetch implementation (useful for testing) */
   fetchImpl?: typeof fetch;
 }
 

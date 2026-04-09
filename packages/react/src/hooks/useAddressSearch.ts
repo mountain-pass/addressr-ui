@@ -1,8 +1,7 @@
 import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import type { Link } from '@windyroad/link-header';
-import { createAddressrClient } from '../api';
-import type { SearchPage } from '../api';
-import type { AddressSearchResult, AddressDetail } from '../types';
+import { createAddressrClient } from '@mountainpass/addressr-core';
+import type { SearchPage, AddressSearchResult, AddressDetail } from '@mountainpass/addressr-core';
 
 export interface UseAddressSearchOptions {
   /** RapidAPI key. Omit when connecting directly to an addressr instance. */

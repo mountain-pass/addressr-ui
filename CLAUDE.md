@@ -12,24 +12,36 @@ Architectural and technical decisions must be documented per [DECISION-MANAGEMEN
 
 ## Project Context
 
-React address autocomplete component library for the Addressr Australian address API.
+UI component monorepo for the Addressr Australian address API.
 
+- **Monorepo**: pnpm workspaces + turborepo
 - **TypeScript** with strict mode
 - **Vite** library mode for building (dual ESM/CJS output)
 - **Vitest** + React Testing Library for tests
-- **downshift** `useCombobox` for accessible combobox pattern (WAI-ARIA APG)
-- **@windyroad/fetch-link** for HATEOAS link-following (RFC 8288)
-- **CSS Modules** for scoped styles
 - **Default branch: `main`**
 
-### Exports
+### Packages
+
+| Package | npm | Purpose |
+|---------|-----|---------|
+| `packages/core` | `@mountainpass/addressr-core` | Framework-agnostic API client, types, parseHighlight |
+| `packages/react` | `@mountainpass/addressr-react` | React hook + component (depends on core) |
+
+### Core exports (`@mountainpass/addressr-core`)
 
 | Export | Purpose |
 |--------|---------|
-| `useAddressSearch` | Headless hook — debounce, abort, HATEOAS navigation, state |
-| `AddressAutocomplete` | Drop-in styled component using downshift |
-| `createAddressrClient` | Low-level HATEOAS API client |
+| `createAddressrClient` | HATEOAS API client with pagination |
 | `parseHighlight` | Safe highlight parser (no dangerouslySetInnerHTML) |
+| Types | `AddressSearchResult`, `AddressDetail`, `SearchPage`, etc. |
+
+### React exports (`@mountainpass/addressr-react`)
+
+| Export | Purpose |
+|--------|---------|
+| `useAddressSearch` | Headless hook — debounce, abort, pagination, state |
+| `AddressAutocomplete` | Drop-in styled component using downshift |
+| Re-exports | Everything from `@mountainpass/addressr-core` |
 
 ### Accessibility (non-negotiable)
 

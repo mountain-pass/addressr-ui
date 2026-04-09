@@ -1,0 +1,52 @@
+{
+  "name": "@mountainpass/addressr-core",
+  "version": "0.1.0",
+  "description": "Framework-agnostic HATEOAS client and types for Australian address search via Addressr",
+  "author": {
+    "name": "Mountain Pass",
+    "url": "https://mountain-pass.com.au"
+  },
+  "license": "Apache-2.0",
+  "type": "module",
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.cjs"
+    }
+  },
+  "files": [
+    "dist/"
+  ],
+  "engines": {
+    "node": ">=18"
+  },
+  "scripts": {
+    "build": "tsc --noEmit && vite build",
+    "test": "vitest run",
+    "lint": "eslint src/"
+  },
+  "dependencies": {
+    "@windyroad/fetch-link": "^3.0.5",
+    "@windyroad/link-header": "^1.0.1"
+  },
+  "devDependencies": {
+    "vite": "^6.3.5",
+    "vite-plugin-dts": "^4.5.4",
+    "vitest": "^3.2.3"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "keywords": [
+    "address",
+    "australia",
+    "addressr",
+    "gnaf",
+    "hateoas",
+    "api-client"
+  ]
+}

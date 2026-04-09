@@ -174,15 +174,9 @@ describe('AddressAutocomplete', () => {
   });
 
   it('loads more results when scrolled near bottom', async () => {
-    let fetchCount = 0;
     const mockFetch = vi.fn()
       .mockResolvedValueOnce(rootResponse())
-      .mockImplementation(() => {
-        fetchCount++;
-        // The last call is fetchNextPage for page 2
-        // We detect it by checking if scroll has been triggered (fetchCount resets don't matter)
-        return Promise.resolve(searchResponse(true));
-      });
+      .mockImplementation(() => Promise.resolve(searchResponse(true)));
 
     render(
       <AddressAutocomplete

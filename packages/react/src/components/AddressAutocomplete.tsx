@@ -1,8 +1,8 @@
 import { useId, useEffect, useRef, useCallback } from 'react';
 import { useCombobox } from 'downshift';
 import { useAddressSearch } from '../hooks/useAddressSearch';
-import { parseHighlight } from '../utils/parseHighlight';
-import type { AddressDetail, AddressSearchResult } from '../types';
+import { parseHighlight } from '@mountainpass/addressr-core';
+import type { AddressDetail, AddressSearchResult } from '@mountainpass/addressr-core';
 import styles from './AddressAutocomplete.module.css';
 
 export interface AddressAutocompleteProps {

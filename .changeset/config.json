@@ -3,7 +3,7 @@
   "changelog": "@changesets/cli/changelog",
   "commit": false,
   "fixed": [],
-  "linked": [],
+  "linked": [["@mountainpass/addressr-core", "@mountainpass/addressr-react"]],
   "access": "public",
   "baseBranch": "main",
   "updateInternalDependencies": "patch",
