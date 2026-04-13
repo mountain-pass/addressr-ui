@@ -1,0 +1,88 @@
+import { describe, it, expect, vi } from 'vitest';
+import { render, screen, waitFor } from '@testing-library/vue';
+import userEvent from '@testing-library/user-event';
+import AddressAutocomplete from './AddressAutocomplete.vue';
+
+function mockResponse(body: unknown, headers: Record<string, string> = {}, url = '') {
+  const resp = new Response(JSON.stringify(body), {
+    status: 200,
+    headers: new Headers(headers),
+  });
+  Object.defineProperty(resp, 'url', { value: url });
+  return resp;
+}
+
+const rootResponse = () =>
+  mockResponse(
+    {},
+    { link: '</addresses{?q}>; rel="https://addressr.io/rels/address-search"' },
+    'https://addressr.p.rapidapi.com/',
+  );
+
+const searchResponse = (hasNext = false) =>
+  mockResponse(
+    [
+      {
+        sla: '1 GEORGE ST, SYDNEY NSW 2000',
+        pid: 'GANSW123',
+        score: 19,
+        highlight: { sla: '<em>1</em> <em>GEORGE</em> ST, SYDNEY NSW 2000' },
+      },
+    ],
+    hasNext
+      ? { link: '</addresses/GANSW123>; rel=canonical; anchor="#/0", </addresses?q=1+george&p=2>; rel=next' }
+      : { link: '</addresses/GANSW123>; rel=canonical; anchor="#/0"' },
+    'https://addressr.p.rapidapi.com/addresses?q=1+george',
+  );
+
+describe('AddressAutocomplete (Vue)', () => {
+  it('renders with accessible label and combobox role', () => {
+    const mockFetch = vi.fn();
+    render(AddressAutocomplete, {
+      props: { fetchImpl: mockFetch },
+    });
+    expect(screen.getByRole('combobox')).toBeInTheDocument();
+    expect(screen.getByText('Search Australian addresses')).toBeInTheDocument();
+  });
+
+  it('displays results after typing', async () => {
+    const mockFetch = vi.fn()
+      .mockResolvedValueOnce(rootResponse())
+      .mockImplementation(() => Promise.resolve(searchResponse()));
+
+    render(AddressAutocomplete, {
+      props: { debounceMs: 10, fetchImpl: mockFetch },
+    });
+
+    await userEvent.type(screen.getByRole('combobox'), '1 george');
+
+    await waitFor(() => {
+      expect(screen.getByRole('option')).toBeInTheDocument();
+    });
+  });
+
+  it('renders highlights with mark elements', async () => {
+    const mockFetch = vi.fn()
+      .mockResolvedValueOnce(rootResponse())
+      .mockImplementation(() => Promise.resolve(searchResponse()));
+
+    render(AddressAutocomplete, {
+      props: { debounceMs: 10, fetchImpl: mockFetch },
+    });
+
+    await userEvent.type(screen.getByRole('combobox'), '1 george');
+
+    await waitFor(() => {
+      const marks = document.querySelectorAll('mark');
+      expect(marks.length).toBeGreaterThan(0);
+    });
+  });
+
+  it('has screen reader status announcements', () => {
+    const mockFetch = vi.fn();
+    render(AddressAutocomplete, {
+      props: { fetchImpl: mockFetch },
+    });
+    expect(screen.getByRole('status')).toBeInTheDocument();
+  });
+});

@@ -1,0 +1,275 @@
+<script lang="ts">
+  import { onDestroy } from 'svelte';
+  import { get } from 'svelte/store';
+  import { parseHighlight } from '@mountainpass/addressr-core';
+  import type { AddressDetail } from '@mountainpass/addressr-core';
+  import { createAddressSearch } from './createAddressSearch';
+
+  export let apiKey: string | undefined = undefined;
+  export let apiUrl: string | undefined = undefined;
+  export let apiHost: string | undefined = undefined;
+  export let label: string = 'Search Australian addresses';
+  export let placeholder: string = 'Start typing an address...';
+  export let debounceMs: number | undefined = undefined;
+  export let onSelect: ((address: AddressDetail) => void) | undefined = undefined;
+  export let fetchImpl: typeof fetch | undefined = undefined;
+
+  const uid = `addressr-${Math.random().toString(36).slice(2, 9)}`;
+  const inputId = `${uid}-input`;
+  const listboxId = `${uid}-listbox`;
+  const statusId = `${uid}-status`;
+  const errorId = `${uid}-error`;
+
+  const store = createAddressSearch({ apiKey, apiUrl, apiHost, debounceMs, fetchImpl });
+
+  let isOpen = false;
+  let highlightedIndex = -1;
+
+  let query = '';
+  let results: any[] = [];
+  let isLoading = false;
+  let isLoadingMore = false;
+  let hasMore = false;
+  let error: Error | null = null;
+  let selectedAddress: AddressDetail | null = null;
+
+  store.subscribe((s) => {
+    query = s.query;
+    results = s.results;
+    isLoading = s.isLoading;
+    isLoadingMore = s.isLoadingMore;
+    hasMore = s.hasMore;
+    error = s.error;
+    selectedAddress = s.selectedAddress;
+    if (selectedAddress && onSelect) {
+      onSelect(selectedAddress);
+    }
+  });
+
+  function handleInput(event: Event) {
+    const value = (event.target as HTMLInputElement).value;
+    store.setQuery(value);
+    isOpen = true;
+    highlightedIndex = -1;
+  }
+
+  function handleKeydown(event: KeyboardEvent) {
+    if (!isOpen && event.key === 'ArrowDown') {
+      isOpen = true;
+      return;
+    }
+    if (event.key === 'ArrowDown') {
+      event.preventDefault();
+      highlightedIndex = Math.min(highlightedIndex + 1, results.length - 1);
+      if (highlightedIndex === results.length - 1 && hasMore) {
+        store.loadMore();
+      }
+    } else if (event.key === 'ArrowUp') {
+      event.preventDefault();
+      highlightedIndex = Math.max(highlightedIndex - 1, -1);
+    } else if (event.key === 'Enter' && highlightedIndex >= 0) {
+      event.preventDefault();
+      selectItem(highlightedIndex);
+    } else if (event.key === 'Escape') {
+      isOpen = false;
+      highlightedIndex = -1;
+    }
+  }
+
+  function selectItem(index: number) {
+    const item = results[index];
+    if (item) {
+      store.selectAddress(item.pid);
+      store.setQuery(item.sla);
+      isOpen = false;
+      highlightedIndex = -1;
+    }
+  }
+
+  function handleScroll(event: Event) {
+    if (!hasMore || isLoadingMore) return;
+    const el = event.target as HTMLElement;
+    if (el.scrollHeight - el.scrollTop - el.clientHeight < 50) {
+      store.loadMore();
+    }
+  }
+
+  function handleBlur() {
+    setTimeout(() => { isOpen = false; highlightedIndex = -1; }, 200);
+  }
+
+  $: showMenu = isOpen && (results.length > 0 || isLoading || (query.length >= 3 && !isLoading));
+  $: activeDescendant = highlightedIndex >= 0 ? `${uid}-option-${highlightedIndex}` : '';
+
+  onDestroy(() => store.destroy());
+</script>
+
+<div class="addressr-wrapper">
+  <label for={inputId} class="addressr-label">{label}</label>
+  <input
+    id={inputId}
+    type="text"
+    role="combobox"
+    autocomplete="off"
+    aria-autocomplete="list"
+    aria-haspopup="listbox"
+    aria-expanded={showMenu}
+    aria-controls={listboxId}
+    aria-activedescendant={activeDescendant}
+    aria-describedby={error ? errorId : undefined}
+    {placeholder}
+    value={query}
+    on:input={handleInput}
+    on:keydown={handleKeydown}
+    on:blur={handleBlur}
+    on:focus={() => { if (results.length > 0) isOpen = true; }}
+    class="addressr-input"
+  />
+
+  <div id={statusId} role="status" aria-live="polite" aria-atomic="true" class="addressr-sr-only">
+    {#if isLoading}
+      Searching addresses...
+    {:else if results.length > 0}
+      {results.length} addresses found
+    {:else if query.length >= 3}
+      No addresses found
+    {/if}
+  </div>
+
+  <ul
+    id={listboxId}
+    role="listbox"
+    class="addressr-menu"
+    class:addressr-menu-hidden={!showMenu}
+    on:scroll={handleScroll}
+  >
+    {#if showMenu}
+      {#if isLoading}
+        <li class="addressr-loading">Searching...</li>
+      {/if}
+      {#if !isLoading && results.length === 0 && query.length >= 3}
+        <li class="addressr-no-results">No addresses found</li>
+      {/if}
+      {#each results as item, index}
+        <li
+          id="{uid}-option-{index}"
+          role="option"
+          aria-selected={highlightedIndex === index}
+          class="addressr-item"
+          class:addressr-item-highlighted={highlightedIndex === index}
+          on:click={() => selectItem(index)}
+          on:mouseenter={() => { highlightedIndex = index; }}
+        >
+          <span>
+            {#each parseHighlight(item.highlight?.sla ?? item.sla) as seg}
+              {#if seg.highlighted}
+                <mark>{seg.text}</mark>
+              {:else}
+                <span>{seg.text}</span>
+              {/if}
+            {/each}
+          </span>
+        </li>
+      {/each}
+      {#if isLoadingMore}
+        <li role="presentation" class="addressr-loading">Loading more...</li>
+      {/if}
+    {/if}
+  </ul>
+
+  {#if error}
+    <div id={errorId} class="addressr-error" role="alert" aria-live="assertive" aria-atomic="true">
+      {error.message}
+    </div>
+  {/if}
+</div>
+
+<style>
+  .addressr-wrapper {
+    position: relative;
+    font-family: system-ui, -apple-system, sans-serif;
+  }
+  .addressr-label {
+    display: block;
+    margin-bottom: 0.25rem;
+    font-weight: 500;
+    font-size: 0.875rem;
+  }
+  .addressr-input {
+    width: 100%;
+    padding: 0.625rem 0.75rem;
+    font-size: 1rem;
+    line-height: 1.5;
+    border: 1px solid #767676;
+    border-radius: 0.25rem;
+    box-sizing: border-box;
+  }
+  .addressr-input:focus-visible {
+    outline: 2px solid #005fcc;
+    outline-offset: 1px;
+    border-color: #005fcc;
+  }
+  .addressr-menu {
+    position: absolute;
+    z-index: 1000;
+    width: 100%;
+    max-height: 20rem;
+    overflow-y: auto;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    background: #fff;
+    border: 1px solid #767676;
+    border-top: none;
+    border-radius: 0 0 0.25rem 0.25rem;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    box-sizing: border-box;
+  }
+  .addressr-menu-hidden {
+    display: none;
+  }
+  .addressr-item {
+    min-height: 2.75rem;
+    padding: 0.625rem 0.75rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    font-size: 0.9375rem;
+    line-height: 1.4;
+  }
+  .addressr-item-highlighted {
+    background-color: #e8f0fe;
+  }
+  .addressr-item :global(mark) {
+    background-color: transparent;
+    font-weight: 700;
+    color: inherit;
+  }
+  .addressr-no-results {
+    padding: 0.625rem 0.75rem;
+    color: #555;
+    font-style: italic;
+    font-size: 0.875rem;
+  }
+  .addressr-loading {
+    padding: 0.625rem 0.75rem;
+    color: #555;
+    font-size: 0.875rem;
+  }
+  .addressr-error {
+    padding: 0.625rem 0.75rem;
+    color: #d32f2f;
+    font-size: 0.875rem;
+  }
+  .addressr-sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+  }
+</style>

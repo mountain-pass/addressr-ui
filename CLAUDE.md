@@ -26,6 +26,8 @@ UI component monorepo for the Addressr Australian address API.
 |---------|-----|---------|
 | `packages/core` | `@mountainpass/addressr-core` | Framework-agnostic API client, types, parseHighlight |
 | `packages/react` | `@mountainpass/addressr-react` | React hook + component (depends on core) |
+| `packages/svelte` | `@mountainpass/addressr-svelte` | Svelte store + component (depends on core) |
+| `packages/vue` | `@mountainpass/addressr-vue` | Vue composable + component (depends on core) |
 
 ### Core exports (`@mountainpass/addressr-core`)
 
@@ -41,6 +43,22 @@ UI component monorepo for the Addressr Australian address API.
 |--------|---------|
 | `useAddressSearch` | Headless hook — debounce, abort, pagination, state |
 | `AddressAutocomplete` | Drop-in styled component using downshift |
+| Re-exports | Everything from `@mountainpass/addressr-core` |
+
+### Svelte exports (`@mountainpass/addressr-svelte`)
+
+| Export | Purpose |
+|--------|---------|
+| `createAddressSearch` | Svelte store — debounce, abort, pagination, state |
+| `AddressAutocomplete` | Drop-in styled component with WAI-ARIA combobox |
+| Re-exports | Everything from `@mountainpass/addressr-core` |
+
+### Vue exports (`@mountainpass/addressr-vue`)
+
+| Export | Purpose |
+|--------|---------|
+| `useAddressSearch` | Vue composable — debounce, abort, pagination, reactive refs |
+| `AddressAutocomplete` | Drop-in styled SFC with WAI-ARIA combobox |
 | Re-exports | Everything from `@mountainpass/addressr-core` |
 
 ### Accessibility (non-negotiable)
