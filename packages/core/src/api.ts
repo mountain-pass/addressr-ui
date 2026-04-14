@@ -1,6 +1,7 @@
 import { glowUpFetchWithLinks } from '@windyroad/fetch-link';
 import type { Link } from '@windyroad/link-header';
 import type { AddressSearchResult, AddressDetail } from './types';
+import { withRetry, type RetryOptions } from './utils/retry';
 
 const SEARCH_REL = 'https://addressr.io/rels/address-search';
 
@@ -11,6 +12,8 @@ export interface AddressrClientOptions {
   apiHost?: string;
   /** Custom fetch implementation (useful for testing) */
   fetchImpl?: typeof fetch;
+  /** Retry configuration. Set to false to disable retries. */
+  retry?: RetryOptions | false;
 }
 
 export interface SearchPage {
@@ -34,7 +37,10 @@ export function createAddressrClient(options: AddressrClientOptions): AddressrCl
     apiUrl = 'https://addressr.p.rapidapi.com/',
     apiHost = 'addressr.p.rapidapi.com',
     fetchImpl,
+    retry: retryConfig,
   } = options;
+
+  const retryOpts: RetryOptions | undefined = retryConfig === false ? undefined : retryConfig ?? { maxRetries: 2, baseDelayMs: 500, maxDelayMs: 5000 };
 
   const headers: Record<string, string> = {};
   if (apiKey) {
@@ -88,7 +94,8 @@ export function createAddressrClient(options: AddressrClientOptions): AddressrCl
     if (!searchLinks.length) {
       throw new Error('Search link relation not found in API root');
     }
-    const response = await fetchLink(searchLinks[0], { signal });
+    const doFetch = () => fetchLink(searchLinks[0], { signal });
+    const response = retryOpts ? await withRetry(doFetch, { ...retryOpts, signal }) : await doFetch();
     if (!response.ok) {
       throw new Error(`Search error: ${response.status} ${response.statusText}`);
     }
@@ -100,7 +107,8 @@ export function createAddressrClient(options: AddressrClientOptions): AddressrCl
     nextLink: Link,
     signal?: AbortSignal,
   ): Promise<SearchPage> {
-    const response = await fetchLink(nextLink, { signal });
+    const doFetch = () => fetchLink(nextLink, { signal });
+    const response = retryOpts ? await withRetry(doFetch, { ...retryOpts, signal }) : await doFetch();
     if (!response.ok) {
       throw new Error(`Search error: ${response.status} ${response.statusText}`);
     }
@@ -121,7 +129,8 @@ export function createAddressrClient(options: AddressrClientOptions): AddressrCl
         (link) => link.rel === 'canonical' && link.anchor === anchor,
       );
       if (canonicalLink) {
-        const response = await fetchLink(canonicalLink, { signal });
+        const doFetch = () => fetchLink(canonicalLink, { signal });
+        const response = retryOpts ? await withRetry(doFetch, { ...retryOpts, signal }) : await doFetch();
         if (!response.ok) {
           throw new Error(`Detail error: ${response.status} ${response.statusText}`);
         }
@@ -136,7 +145,8 @@ export function createAddressrClient(options: AddressrClientOptions): AddressrCl
       `/addresses/${encodeURIComponent(pid)}`,
       baseUrl,
     );
-    const response = await fetchLink(addressUrl.toString(), { signal });
+    const doFetch = () => fetchLink(addressUrl.toString(), { signal });
+    const response = retryOpts ? await withRetry(doFetch, { ...retryOpts, signal }) : await doFetch();
     if (!response.ok) {
       throw new Error(`Detail error: ${response.status} ${response.statusText}`);
     }

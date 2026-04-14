@@ -190,6 +190,38 @@ describe('createAddressrClient', () => {
     await expect(client.prefetch()).resolves.toBeUndefined();
   });
 
+  it('retries search on transient 503 failure', async () => {
+    const retryClient = createAddressrClient({
+      apiKey: 'test-key',
+      fetchImpl: mockFetch,
+      retry: { maxRetries: 1, baseDelayMs: 1, maxDelayMs: 5 },
+    });
+
+    mockFetch
+      .mockResolvedValueOnce(MOCK_ROOT_RESPONSE)
+      .mockResolvedValueOnce({ ok: false, status: 503, statusText: 'Service Unavailable', headers: new Headers({}) })
+      .mockResolvedValueOnce(MOCK_SEARCH_RESPONSE);
+
+    const page = await retryClient.searchAddresses('1 george');
+    expect(page.results).toHaveLength(1);
+    expect(mockFetch).toHaveBeenCalledTimes(3); // root + 503 + success
+  });
+
+  it('does not retry when retry is disabled', async () => {
+    const noRetryClient = createAddressrClient({
+      apiKey: 'test-key',
+      fetchImpl: mockFetch,
+      retry: false,
+    });
+
+    mockFetch
+      .mockResolvedValueOnce(MOCK_ROOT_RESPONSE)
+      .mockResolvedValueOnce({ ok: false, status: 503, statusText: 'Service Unavailable', headers: new Headers({}) });
+
+    await expect(noRetryClient.searchAddresses('test')).rejects.toThrow('503');
+    expect(mockFetch).toHaveBeenCalledTimes(2); // root + single 503
+  });
+
   it('works without apiKey (no RapidAPI headers)', async () => {
     const noKeyFetch = vi.fn();
     const noKeyClient = createAddressrClient({

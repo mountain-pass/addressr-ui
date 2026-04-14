@@ -119,9 +119,13 @@ describe('AddressAutocomplete (Vue)', () => {
   });
 
   it('sets aria-invalid when error occurs', async () => {
-    const mockFetch = vi.fn()
-      .mockResolvedValueOnce(rootResponse())
-      .mockRejectedValueOnce(new Error('Server error'));
+    const mockFetch = vi.fn().mockImplementation((url: string | Request | URL) => {
+      const urlStr = typeof url === 'string' ? url : url instanceof URL ? url.toString() : url.url;
+      if (urlStr.includes('?q=')) {
+        return Promise.reject(new Error('Server error'));
+      }
+      return Promise.resolve(rootResponse());
+    });
 
     render(AddressAutocomplete, {
       props: { debounceMs: 10, fetchImpl: mockFetch },
@@ -131,7 +135,7 @@ describe('AddressAutocomplete (Vue)', () => {
 
     await waitFor(() => {
       expect(screen.getByRole('combobox')).toHaveAttribute('aria-invalid', 'true');
-    });
+    }, { timeout: 10000 });
   });
 
   it('has tabindex="-1" on option items', async () => {
