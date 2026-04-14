@@ -1,5 +1,13 @@
 # @mountainpass/addressr-react
 
+## 0.6.1
+
+### Patch Changes
+
+- 2f606df: docs: document theming, render customization, form props, retry config, and skeleton loading in READMEs
+- Updated dependencies [2f606df]
+  - @mountainpass/addressr-core@0.6.1
+
 ## 0.6.0
 
 ### Minor Changes
