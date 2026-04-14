@@ -1,5 +1,21 @@
 # @mountainpass/addressr-vue
 
+## 0.5.0
+
+### Minor Changes
+
+- 636c530: Error retry with exponential backoff for all API requests.
+  - Transient failures (network errors, 5xx, 429) are retried automatically with exponential backoff and jitter
+  - Client errors (4xx) fail immediately — no wasted retries
+  - Default: 2 retries, 500ms base delay, 5s max delay
+  - Configurable via `retry` option on `createAddressrClient`, or disable with `retry: false`
+  - Respects AbortSignal during backoff — cancelled requests stop retrying immediately
+
+### Patch Changes
+
+- Updated dependencies [636c530]
+  - @mountainpass/addressr-core@0.5.0
+
 ## 0.4.0
 
 ### Minor Changes
