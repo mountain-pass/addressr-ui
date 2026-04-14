@@ -19,13 +19,26 @@ export interface AddressAutocompleteProps {
   debounceMs?: number;
   apiUrl?: string;
   apiHost?: string;
-  /** Custom loading state renderer. */
+  /**
+   * Custom loading state renderer. When provided, you are responsible for
+   * accessibility — return `<li>` elements with appropriate roles.
+   */
   renderLoading?: () => React.ReactNode;
-  /** Custom no-results renderer. */
+  /**
+   * Custom no-results renderer. When provided, you are responsible for
+   * accessibility — return `<li>` elements.
+   */
   renderNoResults?: () => React.ReactNode;
-  /** Custom error renderer. */
+  /**
+   * Custom error renderer. When provided, you are responsible for
+   * accessibility — include `role="alert"` on the container.
+   */
   renderError?: (error: Error) => React.ReactNode;
-  /** Custom result item renderer. */
+  /**
+   * Custom result item renderer. Content is wrapped in the existing `<li>`
+   * with ARIA attributes. You are responsible for maintaining highlight
+   * contrast (WCAG AA 4.5:1) if you restyle highlights.
+   */
   renderItem?: (item: AddressSearchResult, highlighted: boolean, segments: HighlightSegment[]) => React.ReactNode;
   /** @internal */
   fetchImpl?: typeof fetch;

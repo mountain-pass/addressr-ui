@@ -404,6 +404,32 @@ describe('AddressAutocomplete', () => {
     });
   });
 
+  it('accepts renderError prop', async () => {
+    const mockFetch = vi.fn().mockImplementation((url: string | Request | URL) => {
+      const urlStr = typeof url === 'string' ? url : url instanceof URL ? url.toString() : url.url;
+      if (urlStr.includes('?q=')) {
+        return Promise.reject(new Error('Server error'));
+      }
+      return Promise.resolve(rootResponse());
+    });
+
+    render(
+      <AddressAutocomplete
+        apiKey="test"
+        onSelect={() => {}}
+        debounceMs={10}
+        fetchImpl={mockFetch}
+        renderError={(err) => <div data-testid="custom-error" role="alert">{err.message}</div>}
+      />,
+    );
+
+    await userEvent.type(screen.getByRole('combobox'), '1 george');
+
+    await waitFor(() => {
+      expect(screen.getByTestId('custom-error')).toBeInTheDocument();
+    }, { timeout: 10000 });
+  });
+
   it('shows loading indicator while fetching more results', async () => {
     let resolvePage2: (value: Response) => void;
     const page2Promise = new Promise<Response>((resolve) => { resolvePage2 = resolve; });

@@ -1,3 +1,10 @@
+<!--
+  Slots: loading, no-results
+  When using custom slots, you are responsible for accessibility:
+  - loading: return <li> elements
+  - no-results: return <li> elements
+  - Maintain WCAG AA contrast (4.5:1) for any custom text
+-->
 <script lang="ts">
   import { onDestroy } from 'svelte';
   import { get } from 'svelte/store';
