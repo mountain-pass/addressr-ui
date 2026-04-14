@@ -11,6 +11,8 @@
   export let label: string = 'Search Australian addresses';
   export let placeholder: string = 'Start typing an address...';
   export let debounceMs: number | undefined = undefined;
+  export let name: string = 'address';
+  export let required: boolean = false;
   export let onSelect: ((address: AddressDetail) => void) | undefined = undefined;
   export let fetchImpl: typeof fetch | undefined = undefined;
 
@@ -117,6 +119,9 @@
     aria-controls={listboxId}
     aria-activedescendant={activeDescendant}
     aria-describedby={error ? errorId : undefined}
+    aria-required={required || undefined}
+    aria-invalid={error ? true : undefined}
+    {name}
     {placeholder}
     value={query}
     on:input={handleInput}
@@ -154,6 +159,7 @@
         <li
           id="{uid}-option-{index}"
           role="option"
+          tabindex="-1"
           aria-selected={highlightedIndex === index}
           class="addressr-item"
           class:addressr-item-highlighted={highlightedIndex === index}

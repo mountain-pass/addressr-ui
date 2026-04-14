@@ -12,6 +12,10 @@ export interface AddressAutocompleteProps {
   label?: string;
   placeholder?: string;
   className?: string;
+  /** Input name attribute for form submission. */
+  name?: string;
+  /** Whether the field is required. Sets aria-required. */
+  required?: boolean;
   debounceMs?: number;
   apiUrl?: string;
   apiHost?: string;
@@ -25,6 +29,8 @@ export function AddressAutocomplete({
   label = 'Search Australian addresses',
   placeholder = 'Start typing an address...',
   className,
+  name = 'address',
+  required,
   debounceMs,
   apiUrl,
   apiHost,
@@ -96,13 +102,16 @@ export function AddressAutocomplete({
       <input
         {...getInputProps({
           placeholder,
+          name,
           'aria-describedby': error ? errorId : undefined,
+          'aria-required': required || undefined,
+          'aria-invalid': error ? true : undefined,
         })}
         className={styles.input}
       />
 
       {/* Status announcements for screen readers */}
-      <div id={statusId} role="status" aria-live="polite" className={styles.srOnly}>
+      <div id={statusId} role="status" aria-live="polite" aria-atomic="true" className={styles.srOnly}>
         {isLoading && 'Searching addresses...'}
         {!isLoading && results.length > 0 && `${results.length} addresses found`}
         {!isLoading && results.length === 0 && query.length >= 3 && 'No addresses found'}

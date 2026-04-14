@@ -10,11 +10,15 @@ const props = withDefaults(defineProps<{
   apiHost?: string;
   label?: string;
   placeholder?: string;
+  name?: string;
+  required?: boolean;
   debounceMs?: number;
   fetchImpl?: typeof fetch;
 }>(), {
   label: 'Search Australian addresses',
   placeholder: 'Start typing an address...',
+  name: 'address',
+  required: false,
 });
 
 const emit = defineEmits<{
@@ -123,6 +127,9 @@ const activeDescendant = computed(() =>
       :aria-controls="listboxId"
       :aria-activedescendant="activeDescendant"
       :aria-describedby="search.error.value ? errorId : undefined"
+      :aria-required="props.required || undefined"
+      :aria-invalid="search.error.value ? true : undefined"
+      :name="props.name"
       :placeholder="props.placeholder"
       :value="search.query.value"
       class="addressr-input"
@@ -153,6 +160,7 @@ const activeDescendant = computed(() =>
           :key="item.pid"
           :id="`${uid}-option-${index}`"
           role="option"
+          tabindex="-1"
           :aria-selected="highlightedIndex === index"
           class="addressr-item"
           :class="{ 'addressr-item-highlighted': highlightedIndex === index }"

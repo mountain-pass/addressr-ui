@@ -85,4 +85,69 @@ describe('AddressAutocomplete (Svelte)', () => {
     });
     expect(screen.getByRole('status')).toBeInTheDocument();
   });
+
+  it('has name attribute on input defaulting to "address"', () => {
+    const mockFetch = vi.fn();
+    render(AddressAutocomplete, {
+      props: { fetchImpl: mockFetch },
+    });
+    expect(screen.getByRole('combobox')).toHaveAttribute('name', 'address');
+  });
+
+  it('accepts custom name attribute', () => {
+    const mockFetch = vi.fn();
+    render(AddressAutocomplete, {
+      props: { fetchImpl: mockFetch, name: 'shipping-address' },
+    });
+    expect(screen.getByRole('combobox')).toHaveAttribute('name', 'shipping-address');
+  });
+
+  it('sets aria-required when required prop is true', () => {
+    const mockFetch = vi.fn();
+    render(AddressAutocomplete, {
+      props: { fetchImpl: mockFetch, required: true },
+    });
+    expect(screen.getByRole('combobox')).toHaveAttribute('aria-required', 'true');
+  });
+
+  it('does not set aria-required by default', () => {
+    const mockFetch = vi.fn();
+    render(AddressAutocomplete, {
+      props: { fetchImpl: mockFetch },
+    });
+    expect(screen.getByRole('combobox')).not.toHaveAttribute('aria-required');
+  });
+
+  it('sets aria-invalid when error occurs', async () => {
+    const mockFetch = vi.fn()
+      .mockResolvedValueOnce(rootResponse())
+      .mockRejectedValueOnce(new Error('Server error'));
+
+    render(AddressAutocomplete, {
+      props: { debounceMs: 10, fetchImpl: mockFetch },
+    });
+
+    await userEvent.type(screen.getByRole('combobox'), '1 george');
+
+    await waitFor(() => {
+      expect(screen.getByRole('combobox')).toHaveAttribute('aria-invalid', 'true');
+    });
+  });
+
+  it('has tabindex="-1" on option items', async () => {
+    const mockFetch = vi.fn()
+      .mockResolvedValueOnce(rootResponse())
+      .mockImplementation(() => Promise.resolve(searchResponse()));
+
+    render(AddressAutocomplete, {
+      props: { debounceMs: 10, fetchImpl: mockFetch },
+    });
+
+    await userEvent.type(screen.getByRole('combobox'), '1 george');
+
+    await waitFor(() => {
+      const option = screen.getByRole('option');
+      expect(option).toHaveAttribute('tabindex', '-1');
+    });
+  });
 });

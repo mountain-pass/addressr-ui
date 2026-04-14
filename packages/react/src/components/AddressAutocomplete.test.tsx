@@ -236,6 +236,62 @@ describe('AddressAutocomplete', () => {
     expect(screen.getByRole('status')).toBeInTheDocument();
   });
 
+  it('has name attribute on input defaulting to "address"', () => {
+    const mockFetch = vi.fn();
+    render(
+      <AddressAutocomplete apiKey="test" onSelect={() => {}} fetchImpl={mockFetch} />,
+    );
+    expect(screen.getByRole('combobox')).toHaveAttribute('name', 'address');
+  });
+
+  it('accepts custom name attribute', () => {
+    const mockFetch = vi.fn();
+    render(
+      <AddressAutocomplete apiKey="test" onSelect={() => {}} name="shipping-address" fetchImpl={mockFetch} />,
+    );
+    expect(screen.getByRole('combobox')).toHaveAttribute('name', 'shipping-address');
+  });
+
+  it('sets aria-required when required prop is true', () => {
+    const mockFetch = vi.fn();
+    render(
+      <AddressAutocomplete apiKey="test" onSelect={() => {}} required fetchImpl={mockFetch} />,
+    );
+    expect(screen.getByRole('combobox')).toHaveAttribute('aria-required', 'true');
+  });
+
+  it('does not set aria-required by default', () => {
+    const mockFetch = vi.fn();
+    render(
+      <AddressAutocomplete apiKey="test" onSelect={() => {}} fetchImpl={mockFetch} />,
+    );
+    expect(screen.getByRole('combobox')).not.toHaveAttribute('aria-required');
+  });
+
+  it('has aria-atomic on status live region', () => {
+    const mockFetch = vi.fn();
+    render(
+      <AddressAutocomplete apiKey="test" onSelect={() => {}} fetchImpl={mockFetch} />,
+    );
+    expect(screen.getByRole('status')).toHaveAttribute('aria-atomic', 'true');
+  });
+
+  it('sets aria-invalid when error occurs', async () => {
+    const mockFetch = vi.fn()
+      .mockResolvedValueOnce(rootResponse())
+      .mockRejectedValueOnce(new Error('Server error'));
+
+    render(
+      <AddressAutocomplete apiKey="test" onSelect={() => {}} debounceMs={10} fetchImpl={mockFetch} />,
+    );
+
+    await userEvent.type(screen.getByRole('combobox'), '1 george');
+
+    await waitFor(() => {
+      expect(screen.getByRole('combobox')).toHaveAttribute('aria-invalid', 'true');
+    });
+  });
+
   it('loads more results when scrolled near bottom', async () => {
     const mockFetch = vi.fn()
       .mockResolvedValueOnce(rootResponse())
