@@ -98,8 +98,13 @@ echo "Release workflow completed successfully."
 echo "  Release job: $RELEASE_CONCLUSION"
 echo ""
 
+# ── 7. Pull version bumps locally ──────────────────────────────────────────
+echo "Pulling version bump commits..."
+git pull --ff-only || echo "Warning: could not fast-forward pull. Run 'git pull' manually."
+echo ""
+
 # Check npm for the published version
-LATEST=$(npm view @mountainpass/addressr-mcp version 2>/dev/null || echo "not found")
+LATEST=$(npm view @mountainpass/addressr-react version 2>/dev/null || echo "not found")
 echo "Latest npm version: $LATEST"
 echo ""
 echo "CLAUDE: The release workflow completed. Report the results above to the user."
