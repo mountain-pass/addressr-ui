@@ -87,6 +87,31 @@
   font-size: 0.875rem;
 }
 
+.skeleton {
+  height: 1rem;
+  margin: var(--addressr-padding-y, 0.625rem) var(--addressr-padding-x, 0.75rem);
+  border-radius: var(--addressr-border-radius, 0.25rem);
+  background: linear-gradient(
+    90deg,
+    var(--addressr-skeleton-from, #e0e0e0) 25%,
+    var(--addressr-skeleton-to, #f0f0f0) 50%,
+    var(--addressr-skeleton-from, #e0e0e0) 75%
+  );
+  background-size: 200% 100%;
+  animation: addressr-shimmer 1.5s infinite linear;
+}
+
+@keyframes addressr-shimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .skeleton {
+    animation: none;
+  }
+}
+
 .srOnly {
   position: absolute;
   width: 1px;

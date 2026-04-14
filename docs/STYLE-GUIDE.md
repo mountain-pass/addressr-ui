@@ -70,6 +70,18 @@ All visual tokens are exposed as CSS custom properties with the `--addressr-` pr
 | `--addressr-shadow` | `0 4px 6px rgba(0,0,0,0.1)` | Menu shadow |
 | `--addressr-z-index` | `1000` | Menu stacking |
 
+### Skeleton Loading Tokens
+
+| Property | Default | Usage |
+|----------|---------|-------|
+| `--addressr-skeleton-from` | `#e0e0e0` | Skeleton gradient start/end |
+| `--addressr-skeleton-to` | `#f0f0f0` | Skeleton gradient midpoint |
+
+### Animation
+
+- Skeleton shimmer: `addressr-shimmer` keyframe, 1.5s infinite, linear
+- Respects `prefers-reduced-motion: reduce` — disables animation
+
 ### Contrast Requirements
 
 When overriding `--addressr-highlight-bg`, ensure the mark text color (`--addressr-mark-color`) maintains at least 4.5:1 contrast ratio against the new background. When overriding `--addressr-bg`, ensure all text colors maintain WCAG AA contrast.

@@ -2,7 +2,7 @@ import { useId, useEffect, useRef, useCallback } from 'react';
 import { useCombobox } from 'downshift';
 import { useAddressSearch } from '../hooks/useAddressSearch';
 import { parseHighlight } from '@mountainpass/addressr-core';
-import type { AddressDetail, AddressSearchResult } from '@mountainpass/addressr-core';
+import type { AddressDetail, AddressSearchResult, HighlightSegment } from '@mountainpass/addressr-core';
 import styles from './AddressAutocomplete.module.css';
 
 export interface AddressAutocompleteProps {
@@ -19,6 +19,14 @@ export interface AddressAutocompleteProps {
   debounceMs?: number;
   apiUrl?: string;
   apiHost?: string;
+  /** Custom loading state renderer. */
+  renderLoading?: () => React.ReactNode;
+  /** Custom no-results renderer. */
+  renderNoResults?: () => React.ReactNode;
+  /** Custom error renderer. */
+  renderError?: (error: Error) => React.ReactNode;
+  /** Custom result item renderer. */
+  renderItem?: (item: AddressSearchResult, highlighted: boolean, segments: HighlightSegment[]) => React.ReactNode;
   /** @internal */
   fetchImpl?: typeof fetch;
 }
@@ -34,6 +42,10 @@ export function AddressAutocomplete({
   debounceMs,
   apiUrl,
   apiHost,
+  renderLoading,
+  renderNoResults,
+  renderError,
+  renderItem,
   fetchImpl,
 }: AddressAutocompleteProps) {
   const id = useId();
@@ -124,10 +136,18 @@ export function AddressAutocomplete({
         {showMenu && (
           <>
             {isLoading && (
-              <li className={styles.loading}>Searching...</li>
+              renderLoading ? renderLoading() : (
+                <>
+                  <li className={styles.skeleton} style={{ width: '80%' }} aria-hidden="true" />
+                  <li className={styles.skeleton} style={{ width: '60%' }} aria-hidden="true" />
+                  <li className={styles.skeleton} style={{ width: '70%' }} aria-hidden="true" />
+                </>
+              )
             )}
             {!isLoading && results.length === 0 && query.length >= 3 && (
-              <li className={styles.noResults}>No addresses found</li>
+              renderNoResults ? renderNoResults() : (
+                <li className={styles.noResults}>No addresses found</li>
+              )
             )}
             {results.map((item, index) => {
               const segments = parseHighlight(item.highlight?.sla ?? item.sla);
@@ -137,15 +157,17 @@ export function AddressAutocomplete({
                   {...getItemProps({ item, index })}
                   className={`${styles.item} ${highlightedIndex === index ? styles.itemHighlighted : ''}`}
                 >
-                  <span>
-                    {segments.map((seg, i) =>
-                      seg.highlighted ? (
-                        <mark key={i}>{seg.text}</mark>
-                      ) : (
-                        <span key={i}>{seg.text}</span>
-                      ),
-                    )}
-                  </span>
+                  {renderItem ? renderItem(item, highlightedIndex === index, segments) : (
+                    <span>
+                      {segments.map((seg, i) =>
+                        seg.highlighted ? (
+                          <mark key={i}>{seg.text}</mark>
+                        ) : (
+                          <span key={i}>{seg.text}</span>
+                        ),
+                      )}
+                    </span>
+                  )}
                 </li>
               );
             })}
@@ -157,9 +179,11 @@ export function AddressAutocomplete({
       </ul>
 
       {error && (
-        <div id={errorId} className={styles.error} role="alert">
-          {error.message}
-        </div>
+        renderError ? renderError(error) : (
+          <div id={errorId} className={styles.error} role="alert">
+            {error.message}
+          </div>
+        )
       )}
     </div>
   );

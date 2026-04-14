@@ -86,6 +86,29 @@ describe('AddressAutocomplete (Vue)', () => {
     expect(screen.getByRole('status')).toBeInTheDocument();
   });
 
+  it('shows skeleton loading instead of text', async () => {
+    let resolveSearch: (value: Response) => void;
+    const searchPromise = new Promise<Response>((resolve) => { resolveSearch = resolve; });
+
+    const mockFetch = vi.fn()
+      .mockResolvedValueOnce(rootResponse())
+      .mockReturnValue(searchPromise);
+
+    render(AddressAutocomplete, {
+      props: { debounceMs: 10, fetchImpl: mockFetch },
+    });
+
+    await userEvent.type(screen.getByRole('combobox'), '1 george');
+
+    await waitFor(() => {
+      const skeletons = document.querySelectorAll('[class*="skeleton"]');
+      expect(skeletons.length).toBeGreaterThanOrEqual(3);
+    });
+
+    expect(screen.queryByText('Searching...')).not.toBeInTheDocument();
+    resolveSearch!(searchResponse());
+  });
+
   it('has name attribute on input defaulting to "address"', () => {
     const mockFetch = vi.fn();
     render(AddressAutocomplete, {

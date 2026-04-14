@@ -150,10 +150,16 @@
   >
     {#if showMenu}
       {#if isLoading}
-        <li class="addressr-loading">Searching...</li>
+        <slot name="loading">
+          <li class="addressr-skeleton" style="width: 80%" aria-hidden="true"></li>
+          <li class="addressr-skeleton" style="width: 60%" aria-hidden="true"></li>
+          <li class="addressr-skeleton" style="width: 70%" aria-hidden="true"></li>
+        </slot>
       {/if}
       {#if !isLoading && results.length === 0 && query.length >= 3}
-        <li class="addressr-no-results">No addresses found</li>
+        <slot name="no-results">
+          <li class="addressr-no-results">No addresses found</li>
+        </slot>
       {/if}
       {#each results as item, index}
         <li
@@ -267,6 +273,28 @@
     padding: var(--addressr-padding-y, 0.625rem) var(--addressr-padding-x, 0.75rem);
     color: var(--addressr-error-color, #d32f2f);
     font-size: 0.875rem;
+  }
+  .addressr-skeleton {
+    height: 1rem;
+    margin: var(--addressr-padding-y, 0.625rem) var(--addressr-padding-x, 0.75rem);
+    border-radius: var(--addressr-border-radius, 0.25rem);
+    background: linear-gradient(
+      90deg,
+      var(--addressr-skeleton-from, #e0e0e0) 25%,
+      var(--addressr-skeleton-to, #f0f0f0) 50%,
+      var(--addressr-skeleton-from, #e0e0e0) 75%
+    );
+    background-size: 200% 100%;
+    animation: addressr-shimmer 1.5s infinite linear;
+  }
+  @keyframes addressr-shimmer {
+    0% { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .addressr-skeleton {
+      animation: none;
+    }
   }
   .addressr-sr-only {
     position: absolute;

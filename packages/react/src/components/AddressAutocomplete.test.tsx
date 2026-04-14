@@ -296,6 +296,80 @@ describe('AddressAutocomplete', () => {
     }, { timeout: 10000 });
   });
 
+  it('shows skeleton loading instead of text', async () => {
+    let resolveSearch: (value: Response) => void;
+    const searchPromise = new Promise<Response>((resolve) => { resolveSearch = resolve; });
+
+    const mockFetch = vi.fn()
+      .mockResolvedValueOnce(rootResponse())
+      .mockReturnValue(searchPromise);
+
+    render(
+      <AddressAutocomplete apiKey="test" onSelect={() => {}} debounceMs={10} fetchImpl={mockFetch} />,
+    );
+
+    await userEvent.type(screen.getByRole('combobox'), '1 george');
+
+    await waitFor(() => {
+      const skeletons = document.querySelectorAll('[class*="skeleton"]');
+      expect(skeletons.length).toBeGreaterThanOrEqual(3);
+    });
+
+    expect(screen.queryByText('Searching...')).not.toBeInTheDocument();
+    resolveSearch!(searchResponse());
+  });
+
+  it('uses custom renderLoading when provided', async () => {
+    let resolveSearch: (value: Response) => void;
+    const searchPromise = new Promise<Response>((resolve) => { resolveSearch = resolve; });
+
+    const mockFetch = vi.fn()
+      .mockResolvedValueOnce(rootResponse())
+      .mockReturnValue(searchPromise);
+
+    render(
+      <AddressAutocomplete
+        apiKey="test"
+        onSelect={() => {}}
+        debounceMs={10}
+        fetchImpl={mockFetch}
+        renderLoading={() => <li data-testid="custom-loading">Please wait...</li>}
+      />,
+    );
+
+    await userEvent.type(screen.getByRole('combobox'), '1 george');
+
+    await waitFor(() => {
+      expect(screen.getByTestId('custom-loading')).toBeInTheDocument();
+    });
+    resolveSearch!(searchResponse());
+  });
+
+  it('uses custom renderNoResults when provided', async () => {
+    const emptyResponse = () =>
+      mockResponse([], {}, 'https://addressr.p.rapidapi.com/addresses?q=zzz+nothing');
+
+    const mockFetch = vi.fn()
+      .mockResolvedValueOnce(rootResponse())
+      .mockImplementation(() => Promise.resolve(emptyResponse()));
+
+    render(
+      <AddressAutocomplete
+        apiKey="test"
+        onSelect={() => {}}
+        debounceMs={10}
+        fetchImpl={mockFetch}
+        renderNoResults={() => <li data-testid="custom-empty">Nothing here</li>}
+      />,
+    );
+
+    await userEvent.type(screen.getByRole('combobox'), 'zzz nothing');
+
+    await waitFor(() => {
+      expect(screen.getByTestId('custom-empty')).toBeInTheDocument();
+    });
+  });
+
   it('loads more results when scrolled near bottom', async () => {
     const mockFetch = vi.fn()
       .mockResolvedValueOnce(rootResponse())
