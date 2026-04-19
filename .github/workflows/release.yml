@@ -22,6 +22,14 @@ jobs:
       - run: pnpm install --frozen-lockfile
       - run: pnpm lint
       - run: pnpm test
+      - run: pnpm test:integration
+        env:
+          ADDRESSR_RAPIDAPI_KEY: ${{ secrets.ADDRESSR_RAPIDAPI_KEY }}
+      - name: Install Playwright browsers
+        run: pnpm --filter @mountainpass/addressr-core exec playwright install --with-deps chromium
+      - run: pnpm test:integration:browser
+        env:
+          ADDRESSR_RAPIDAPI_KEY: ${{ secrets.ADDRESSR_RAPIDAPI_KEY }}
       - run: pnpm build
 
   release:

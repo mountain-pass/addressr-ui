@@ -14,6 +14,8 @@
   "scripts": {
     "build": "turbo build",
     "test": "turbo test",
+    "test:integration": "turbo test:integration",
+    "test:integration:browser": "turbo test:integration:browser",
     "lint": "turbo lint",
     "pre-commit": "lint-staged",
     "push:watch": "bash scripts/push-and-watch.sh",

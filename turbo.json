@@ -8,6 +8,14 @@
     "test": {
       "dependsOn": ["^build"]
     },
+    "test:integration": {
+      "dependsOn": ["^build"],
+      "env": ["ADDRESSR_RAPIDAPI_KEY"]
+    },
+    "test:integration:browser": {
+      "dependsOn": ["^build"],
+      "env": ["ADDRESSR_RAPIDAPI_KEY"]
+    },
     "lint": {}
   }
 }
