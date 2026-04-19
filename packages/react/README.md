@@ -163,6 +163,20 @@ Built with [downshift](https://www.downshift-js.com/) for WAI-ARIA combobox patt
 - Accessible label always present
 - Infinite scroll with loading indicator
 
+## Postcode, Locality, and State search
+
+For narrower lookups (postcode-only picker on a shipping form, suburb autocomplete, state dropdown) the package also exports three drop-in components and matching headless hooks. Each mirrors `AddressAutocomplete`'s a11y, keyboard, and render-zone contract; the only difference is `onSelect` receives the `SearchResult` directly (no follow-up detail fetch — see ADR 006).
+
+```tsx
+import { PostcodeAutocomplete, LocalityAutocomplete, StateAutocomplete } from '@mountainpass/addressr-react';
+
+<PostcodeAutocomplete apiKey="..." onSelect={(r) => console.log(r.postcode, r.localities)} />
+<LocalityAutocomplete apiKey="..." onSelect={(r) => console.log(r.name, r.state.abbreviation, r.postcode)} />
+<StateAutocomplete   apiKey="..." onSelect={(r) => console.log(r.name, r.abbreviation)} />
+```
+
+Headless equivalents `usePostcodeSearch`, `useLocalitySearch`, `useStateSearch` are also exported and follow the same shape as `useAddressSearch`.
+
 ## Re-exports
 
 This package re-exports everything from [`@mountainpass/addressr-core`](../core) for convenience -- `createAddressrClient`, `parseHighlight`, and all types.
