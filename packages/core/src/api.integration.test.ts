@@ -66,12 +66,7 @@ describe('addressr live API integration', () => {
     }, 30000);
   });
 
-  // Skipped pending upstream fix — see docs/problems/004-rapidapi-gateway-root-cache.md.
-  // The RapidAPI edge serves a stale root Link header that does not yet advertise
-  // the new postcode/locality/state rels, so createAddressrClient() fails rel
-  // discovery in production. The Cache-Control assertion, root discovery test,
-  // and searchAddresses test above still run and catch other regressions.
-  describe.skip('searchPostcodes', () => {
+  describe('searchPostcodes', () => {
     it('returns at least one result for a known postcode', async () => {
       const client = createIntegrationClient();
       const page = await client.searchPostcodes('2000');
@@ -85,8 +80,7 @@ describe('addressr live API integration', () => {
     }, 30000);
   });
 
-  // Skipped pending upstream fix — see docs/problems/004-rapidapi-gateway-root-cache.md.
-  describe.skip('searchLocalities', () => {
+  describe('searchLocalities', () => {
     it('returns at least one result for a known locality', async () => {
       const client = createIntegrationClient();
       const page = await client.searchLocalities('sydney');
@@ -102,8 +96,7 @@ describe('addressr live API integration', () => {
     }, 30000);
   });
 
-  // Skipped pending upstream fix — see docs/problems/004-rapidapi-gateway-root-cache.md.
-  describe.skip('searchStates', () => {
+  describe('searchStates', () => {
     it('returns at least one result for a known state', async () => {
       const client = createIntegrationClient();
       const page = await client.searchStates('NSW');

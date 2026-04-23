@@ -1,6 +1,7 @@
 ---
-status: "proposed"
+status: "accepted"
 date: 2026-04-16
+accepted-date: 2026-04-24
 decision-makers: [tom-howard]
 consulted: [wr-architect:agent, wr-jtbd:agent]
 informed: []

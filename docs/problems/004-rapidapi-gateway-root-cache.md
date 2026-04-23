@@ -1,9 +1,10 @@
 ---
 id: PROB-004
-status: open
+status: resolved
 severity: medium
 created: 2026-04-16
 reopened: 2026-04-18
+resolved: 2026-04-24
 ---
 
 # RapidAPI gateway serves stale root Link header, hiding new rels
@@ -93,3 +94,30 @@ Close when any of:
 3. Project decides to introduce an opt-in `cacheBustRoot` flag via a new ADR (the "durable workaround" path). This would supersede the wait-for-upstream stance.
 
 Severity raised from low → medium because it now blocks a committed release.
+
+## Resolution (2026-04-24, final)
+
+**Closed by criterion 1** — the RapidAPI / Cloudflare edge cache expired naturally and all three new rels (`postcode-search`, `locality-search`, `state-search`) are now advertised on the root response.
+
+### Timeline
+
+- 2026-04-20 ~05:00 UTC: first edge node hits `max-age=604800` and returns `cf-cache-status: DYNAMIC` with the fresh Link header.
+- 2026-04-20 08:45 local: partial propagation observed — ~50% of edge nodes still served the 6.75-day-old cached copy. Integration suite flaked 40–60% across 6 consecutive runs.
+- 2026-04-20 11:46 local: first full 6/6 pass, but confirmation runs immediately after failed (4/6, 5/6) — sampling proved single-run passes can mask remaining stale pockets.
+- 2026-04-24 08:22 local: 5/5 consecutive 6/6 passes. Cache fully stable.
+
+### Evidence
+
+Live curl on 2026-04-20 showed `cf-cache-status` oscillating between `HIT` (age 583204s, stale Link) and `DYNAMIC` (fresh Link with all 7 rels). Full propagation took ~4 days beyond the nominal `max-age=604800` expiry — longer than expected for Cloudflare's distributed edge.
+
+### Mitigations now unblocked
+
+- `packages/core/src/api.integration.test.ts` — three `describe.skip` blocks removed; all 6 tests now active.
+- `docs/decisions/006-additional-search-endpoints.proposed.md` → `.accepted.md` with `accepted-date: 2026-04-24`.
+- Release 1 unblocked.
+
+### Lessons for future rel additions
+
+- Cloudflare edge node propagation for a 7-day `max-age` entry can lag the nominal expiry by several days. Don't plan a release on the assumption that `max-age` alone guarantees uniform refresh.
+- A single 6/6 integration run is insufficient proof of stability — confirm with ≥3 consecutive passes because edge routing is stochastic per-request.
+- Consider (but do not implement unless triggered again) the opt-in `cacheBustRoot` flag — the "durable workaround" path — if another rel addition causes a similar release block.
