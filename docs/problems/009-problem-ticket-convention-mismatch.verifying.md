@@ -1,8 +1,9 @@
 ---
 id: PROB-009
-status: open
+status: verifying
 severity: low
 created: 2026-04-25
+fix-released: 2026-04-27
 ---
 
 # Project's problem-ticket convention diverges from `manage-problem` skill layout
@@ -43,3 +44,11 @@ Local fix — `CLAUDE.md` / `AGENTS.md` edit (Option B) or batch rename + README
 - Surfaced during the 2026-04-25 retrospective (`/wr-retrospective:run-retro`) after the AFK problem-work loop.
 - Workaround used for P008 commit `d86240c` (`fix(ci): add preflight secret check (closes P008)`).
 - BRIEFING.md "Problem ticket convention" entry references this ticket.
+
+## Fix Released
+
+Option A (migrate to skill suffix layout) applied on 2026-04-27. All 9 ticket files renamed to `NNN-kebab-title.<status>.md` matching the `wr-itil:manage-problem` skill convention. Each file's frontmatter `status:` field updated to match the new suffix. `docs/problems/README.md` regenerated to reflect the new layout. CLAUDE.md gained a "Problem Tracking" subsection documenting the convention.
+
+The new layout mirrors the project's own decision-file convention (`docs/decisions/NNN-title.<status>.md` per `DECISION-MANAGEMENT.md`) — internally consistent, no new architectural choice.
+
+**Awaiting user verification**: pass when at least one subsequent `/wr-itil:manage-problem` operation (review, work, or transition) runs against the migrated layout without requiring manual adaptation. Specifically, the verification queue glob (`docs/problems/*.verifying.md`) should now correctly surface this ticket as a Verification Pending entry, and any future status transition should `git mv` cleanly without convention-mismatch friction.

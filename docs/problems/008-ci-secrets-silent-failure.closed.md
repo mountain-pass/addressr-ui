@@ -1,9 +1,10 @@
 ---
 id: PROB-008
-status: verifying
+status: closed
 severity: low
 created: 2026-04-24
 fix-released: 2026-04-24
+closed: 2026-04-27
 ---
 
 # CI fails opaquely when required GitHub Actions secrets are missing
@@ -54,3 +55,12 @@ Applied Option 1 (preflight secret check) in `.github/workflows/release.yml` on 
 - `release` job checks `NPM_TOKEN`.
 
 Awaiting user verification: the next push to `main` will exercise the new preflight. Verification is green if the "Verify required secrets" step passes silently (both secrets set) and the remainder of CI completes as before. Negative-path verification (secret missing → loud failure) is left as a future event — no action needed to trigger it deliberately.
+
+## Closed
+
+Verified by user on 2026-04-27 after two consecutive CI runs exercised the new preflight silently:
+
+- Run [24889370990](https://github.com/mountain-pass/addressr-ui/actions/runs/24889370990) (commit `d86240c`) — first run with the preflight; both jobs passed cleanly.
+- Run [24946057769](https://github.com/mountain-pass/addressr-ui/actions/runs/24946057769) (commit `e5f0eb3`) — second run; preflight remained silent, full pipeline green.
+
+The positive-path behaviour is confirmed. Negative-path (a deliberately missing secret triggering the `::error::` line) was not exercised — but the gate is dormant until needed and the implementation is straightforward enough that user judgment accepts the closure without negative-path proof.

@@ -1,10 +1,11 @@
 ---
 id: PROB-004
-status: resolved
+status: closed
 severity: medium
 created: 2026-04-16
 reopened: 2026-04-18
 resolved: 2026-04-24
+closed: 2026-04-24
 ---
 
 # RapidAPI gateway serves stale root Link header, hiding new rels
