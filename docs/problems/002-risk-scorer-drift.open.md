@@ -24,3 +24,7 @@ Minor friction — adds one extra agent call (~15-20 seconds) when the staging s
 1. Score could be computed at commit time rather than prompt-submit time
 2. The gate could re-score automatically instead of blocking
 3. Document the "stage first, then submit prompt" workflow more prominently
+
+## Related
+
+- **Upstream report pending** — external dependency identified; invoke /wr-itil:report-upstream when ready

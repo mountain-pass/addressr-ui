@@ -24,3 +24,7 @@ Slows development velocity for non-visual changes to component files. Does not c
 1. Review gates could inspect the diff rather than the file extension to skip irrelevant checks (e.g., style guide review for JSDoc-only changes)
 2. A "batch review" mode that runs all 4 agents once for a set of planned changes rather than per-edit
 3. Test files (`.test.tsx`) could be exempt from style-guide and voice-tone gates
+
+## Related
+
+- **Upstream report pending** — external dependency identified; invoke /wr-itil:report-upstream when ready

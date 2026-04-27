@@ -30,3 +30,7 @@ Same pattern likely affects the architect, style-guide, and voice-tone hooks whi
 2. Walk upward from `$PWD` looking for `docs/jtbd/`, `docs/decisions/`, etc. until the filesystem root — finds the nearest project.
 3. Document the "stay at project root" convention and have agents avoid `cd` in bash commands. Less robust; easy to forget.
 4. Update the hook's error message to distinguish "docs genuinely missing" from "PWD mismatch — try `cd <project-root>`".
+
+## Related
+
+- **Upstream report pending** — external dependency identified; invoke /wr-itil:report-upstream when ready

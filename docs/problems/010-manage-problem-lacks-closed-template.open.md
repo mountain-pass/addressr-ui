@@ -48,3 +48,4 @@ Upstream — `windyroad/agent-plugins`, plugin `wr-itil`, file `packages/itil/sk
 - P009 (`docs/problems/009-problem-ticket-convention-mismatch.verifying.md`) — same plugin's filename-suffix convention; that one was project-local-actionable, this one is upstream-only.
 - P008 closure (commit `3682b5d`) — first occurrence where the missing template was felt; the invented format used there is the workaround model for now.
 - P005 (`docs/problems/005-external-comms-voice-tone-skipped.parked.md`) — also parked-upstream against `windyroad/agent-plugins`; if both eventually go upstream, batch them in one PR.
+- **Upstream report pending** — external dependency identified; invoke /wr-itil:report-upstream when ready

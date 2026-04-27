@@ -35,3 +35,7 @@ Option 1 is the lightest-weight and most likely to catch the pattern early. Opti
 ## Routing
 
 This ticket is project-authored but the fix lives upstream in the `wr-retrospective` plugin (`windyroad/agent-plugins`). Share with the maintainers.
+
+## Related
+
+- **Upstream report pending** — external dependency identified; invoke /wr-itil:report-upstream when ready
