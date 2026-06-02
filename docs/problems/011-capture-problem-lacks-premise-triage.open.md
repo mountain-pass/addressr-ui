@@ -56,4 +56,12 @@ Upstream — `windyroad/agent-plugins`, plugin `wr-itil`, file `packages/itil/sk
 - P010 (`docs/problems/010-manage-problem-lacks-closed-template.open.md`) — another wr-itil skill-gap ticket; both target `packages/itil/skills/*/SKILL.md`.
 - ADR-032 (upstream `packages/itil/decisions/032-governance-skill-invocation-patterns.md`) — the foreground-lightweight-capture variant amendment that landed capture-problem. The premise-triage gap is a follow-on amendment opportunity.
 - ADR-044 (upstream) — decision-delegation contract; the recommended Step 1.7 fits the derive-first / category-4 silent-framework / category-5 fallback shape already used at Step 1.5.
-- **Upstream report pending** — external dependency identified; invoke /wr-itil:report-upstream when ready.
+- **Reported upstream**: https://github.com/windyroad/agent-plugins/issues/202 (2026-06-02)
+
+## Reported Upstream
+
+- **URL**: https://github.com/windyroad/agent-plugins/issues/202
+- **Reported**: 2026-06-02
+- **Template used**: problem-report.yml
+- **Disclosure path**: public issue
+- **Cross-reference confirmed**: yes — upstream issue body contains `Reported from https://github.com/Mountain-Pass/addressr-react/blob/main/docs/problems/011-capture-problem-lacks-premise-triage.open.md`
