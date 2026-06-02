@@ -1,9 +1,10 @@
 ---
 id: PROB-009
-status: verifying
+status: closed
 severity: low
 created: 2026-04-25
 fix-released: 2026-04-27
+closed: 2026-06-02
 ---
 
 # Project's problem-ticket convention diverges from `manage-problem` skill layout
@@ -52,3 +53,13 @@ Option A (migrate to skill suffix layout) applied on 2026-04-27. All 9 ticket fi
 The new layout mirrors the project's own decision-file convention (`docs/decisions/NNN-title.<status>.md` per `DECISION-MANAGEMENT.md`) — internally consistent, no new architectural choice.
 
 **Awaiting user verification**: pass when at least one subsequent `/wr-itil:manage-problem` operation (review, work, or transition) runs against the migrated layout without requiring manual adaptation. Specifically, the verification queue glob (`docs/problems/*.verifying.md`) should now correctly surface this ticket as a Verification Pending entry, and any future status transition should `git mv` cleanly without convention-mismatch friction.
+
+## Closed
+
+Verified by user on 2026-06-02 after five weeks of clean operation against the suffix layout, capped by three positive-path observations in a single session:
+
+- `/wr-itil:capture-problem` wrote `docs/problems/011-capture-problem-lacks-premise-triage.open.md` cleanly. No convention adaptation was needed; the create-gate, marker writes, and commit-message verb all matched the skill's defaults.
+- `/wr-itil:report-upstream` resolved P011 via the dual-tolerant glob (`docs/problems/${LOCAL_ID}-*.{open,known-error,verifying,closed}.md docs/problems/*/${LOCAL_ID}-*.md`) without adaptation; back-write to the `## Reported Upstream` section landed in commit `754c3f2`.
+- `/wr-itil:review-problems` (this invocation) reads the suffix layout cleanly and surfaced this very ticket in the Verification Queue glob (`docs/problems/*.verifying.md`) — exactly the behaviour the verification criteria named.
+
+Negative-path (a fresh ticket reaching `.parked.md` via `git mv`) was not exercised this cycle, but the read path and the create-and-rename paths are the friction surfaces P009 actually documented. Positive-path confirmation is sufficient for closure.
