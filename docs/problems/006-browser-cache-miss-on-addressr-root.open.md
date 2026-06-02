@@ -52,3 +52,7 @@ Close when either:
 
 1. Upstream gateway is fixed: re-running the Playwright test shows `fromDiskCache: true` (or no network event fired) for Page B's GET.
 2. Project decides to remove the browser-cache assertion entirely (unlikely; the test is cheap infrastructure).
+
+## Related
+
+- **Upstream report pending** — external dependency identified; invoke /wr-itil:report-upstream when ready.
