@@ -36,8 +36,8 @@
     "@windyroad/link-header": "^1.0.1"
   },
   "devDependencies": {
-    "@playwright/test": "^1.59.1",
-    "playwright": "^1.59.1",
+    "@playwright/test": "^1.60.0",
+    "playwright": "^1.60.0",
     "vite": "^6.3.5",
     "vite-plugin-dts": "^4.5.4",
     "vitest": "^3.2.3"
